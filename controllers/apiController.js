@@ -113,73 +113,27 @@ router.post("/:id/actions/:id", (req, res) => {
 
 router.put("/:id/actions/:id", (req, res) => {
     const id = req.params.id;
-    const valid = validateAction(actionData);
-
-	
+    const updates = req.body
+    const valid = validateAction(updates);
+    
     if (valid.success) {
+
         Action.update(id, updates)
         res
             .status(201)
-            .json({ message: "successfully added action", actionData });
+            .json({ message: "successfully added action", updates });
     } else {
         res.status(400).json(valid);
     }
-		.catch(error => {
-			// log error to server
-			console.log(error);
-			res.status(500).json({
-				message: "Error retrieving actions"
-			});
-		});
-});
-
-router.put("/:id/actions", (req, res) => {
-	const projectId = req.params.id;
-	const actionData = { project_id: projectId, ...req.body };
-	const valid = validateAction(actionData);
-	Project.get(projectId).then(project => {
-		if (project) {
-			if (valid.success) {
-                Project.getProjectActions(projectId)
-                Action.insert(actionData);
-				res
-					.status(201)
-					.json({ message: "successfully added action", actionData });
-			} else {
-				res.status(400).json(valid);
-			}
-		} else {
-			res.status(404).json({ message: "project not found" });
-		}
-	});
+		
 });
 
 
-router.put("/:id/actions/:id", (req, res) => {
-	const projectId = req.params.id;
-    const actionData = { project_id: projectId, ...req.body }
-	const valid = validateAction(actionData);
-	Project.get(projectId).then(project => {
-		if (project) {
-			if (valid.success) {
-                console.log(projectId)
-				Action.update(actionData);
-				res
-					.status(201)
-					.json({ message: "successfully updated action", actionData });
-			} else {
-				res.status(400).json(valid);
-			}
-		} else {
-			res.status(404).json({ message: "project not found" });
-		}
-	});
-});
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id/actions/:id", (req, res) => {
 	id = req.params.id;
 
-	Project.remove(id)
+	Action.remove(id)
 		.then(removed => {
 			if (removed) {
 				res
